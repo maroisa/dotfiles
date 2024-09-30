@@ -7,3 +7,4 @@ else
     curl "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/refs/heads/master/lib/key-bindings.zsh" >> $HOME/.zgen/key-bindings.zsh
 fi
 
+cp -r .zshrc $HOME/.zshrc
