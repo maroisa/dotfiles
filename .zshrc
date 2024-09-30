@@ -5,6 +5,7 @@ SAVEHIST=10000
 # End of lines configured by zsh-newuser-install
 
 source $HOME/.zgen/zgen.zsh
+source /home/rin/.zgen/key-bindings.zsh
 
 if ! zgen saved; then
   zgen load zsh-users/zsh-syntax-highlighting
@@ -13,4 +14,3 @@ if ! zgen saved; then
   zgen save
 fi
 
-source /home/rin/.zgen/key-bindings.zsh
