@@ -1,97 +1,155 @@
-;;; Initialize package sources
+;; package.el initialization
 (require 'package)
-(setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-        ("gnu"   . "https://elpa.gnu.org/packages/")))
+(add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
 
-;; Install use-package if missing
 (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
   (package-install 'use-package))
-(require 'use-package)
-(setq use-package-always-ensure t)
 
-;; PATH
+(eval-and-compile
+  (setq use-package-always-ensure t
+        use-package-expand-minimally t))
+
+(defun project-find-go-module (dir)
+  (when-let ((root (locate-dominating-file dir "go.mod")))
+    (cons 'go-module root)))
+
+(cl-defmethod project-root ((project (head go-module)))
+  (cdr project))
+
+(add-hook 'project-find-functions #'project-find-go-module)
+
 (use-package exec-path-from-shell
   :config
   (exec-path-from-shell-initialize))
 
+;; -- UI --
 
-;; Company
-(use-package company
-  :hook (after-init . global-company-mode)
+(with-eval-after-load 'org (global-org-modern-mode))
+
+(use-package kanagawa-themes
+  :config (load-theme 'kanagawa-wave t))
+
+(use-package spacious-padding
+  :ensure t
   :config
-  (setq company-minimum-prefix-length 1
-        company-idle-delay 0.0))
+  (spacious-padding-mode 1))
 
-;; Flycheck
-(use-package flycheck
-  :hook (after-init . global-flycheck-mode))
-
-;; Eglot
-(use-package eglot
-  :commands (eglot)
-  :hook ((go-mode php-mode python-mode) . eglot-ensure))
-
-;; Go mode
-(use-package go-mode
-  :mode "\\.go\\'"
+(use-package ultra-scroll
+  ;:vc (:url "https://github.com/jdtsmith/ultra-scroll") ; if desired (emacs>=v30)
+  :init
+  (setq scroll-conservatively 3 ; or whatever value you prefer, since v0.4
+        scroll-margin 0)        ; important: scroll-margin>0 not yet supported
   :config
-  (setq gofmt-command "goimports")
-  (add-hook 'before-save-hook #'gofmt-before-save))
+  (ultra-scroll-mode 1))
 
-;; PHP mode
-(use-package php-mode
-  :mode "\\.php\\'")
+;; org-modern basic setup
+(use-package org-modern
+  :ensure t
+  :hook
+  (org-mode . org-modern-mode)
+  (org-mode . variable-pitch-mode)
+  (org-agenda-finalize . org-modern-agenda)
+  :config
+  ;; Headline bullets (replace stars)
+  (setq org-modern-star '("◉" "○" "●" "◆" "▶" "▸"))
+  (setq org-modern-label-border 0.25)
+  (setq org-modern-todo-faces
+        '(("TODO" . (:foreground "#ff6c6b" :weight bold))
+          ("NEXT" . (:foreground "#ECBE7B" :weight bold))
+          ("DONE" . (:foreground "#98be65" :weight bold))
+          ("WAIT" . (:foreground "#51afef" :weight bold))))
 
-(use-package python-mode
-  :mode "\\.py\\'")
+  ;; Make headlines scale by level
+  (setq org-modern-scale-headlines nil)
+  (setq org-modern-headline nil)
 
-;; Dashboard
+  ;; Optional: nicer priority cookies
+  (setq org-modern-priority
+        '((?A . "🔥")
+          (?B . "⬆")
+          (?C . "⬇")))
+  (add-hook 'org-mode-hook #'org-indent-mode))
+
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+
 (use-package dashboard
   :ensure t
   :config
-  (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook)
+  (setq dashboard-center-content t)
+  (setq dashboard-banner-logo-title "\"Every soul has its dark\" - John Darksoul")
+  (setq dashboard-startup-banner "~/.config/emacs/kms.txt"))
 
-;; Treemacs
-(use-package treemacs
-  :bind (("C-x d" . treemacs))
-  :config (setq treemacs-width 36))
+(use-package vertico
+  :init (vertico-mode))
 
-(use-package treemacs-projectile
-  :after (treemacs projectile))
+;; -- LANG --
+(use-package eglot
+  :ensure t
+  :hook ((c-mode go-mode python-mode web-mode emmet-mode) . eglot-ensure)
+  :config
+  (setq eglot-sync-connect nil)
+  (setq eglot-events-buffer-size 0))
 
-(use-package treemacs-magit
-  :after (treemacs magit))
+(use-package corfu
+  :ensure t
+  :init
+  (global-corfu-mode)
+  :custom
+  (corfu-auto t)                ;; Enable auto completion
+  (corfu-auto-delay 0.2)
+  (corfu-auto-prefix 1)
+  (corfu-cycle t)               ;; Cycle through candidates
+  (corfu-preselect 'prompt)
+  (corfu-quit-no-match 'separator))
 
-(use-package spacious-padding
-  :config (setq spacious-padding-widths 10))
+(use-package flycheck
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 
+(use-package go-mode
+  :mode "\\.go\\'"
+  :config
+  (defun eglot-format-buffer-before-save ()
+    (add-hook 'before-save-hook #'eglot-format-buffer -10 t))
+  (add-hook 'go-mode-hook #'eglot-format-buffer-before-save))
+
+(use-package python-mode)
+(use-package web-mode)
+(use-package emmet-mode)
+
+(electric-pair-mode t)
+(set-frame-font "Inconsolata Nerd Font 18" nil t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(auto-save-mode -1)
+(global-display-line-numbers-mode t)
+(setq tab-always-indent 'complete)
+(setq text-mode-ispell-word-completion nil)
 (setq make-backup-files nil)
-
-(setq-default indent-tabs-mode nil)
+(setq auto-save-default nil)
+(setq delete-auto-save-files t)
+(setq kill-buffer-delete-auto-save-files t)
+(setq org-agenda-files '("~/org"))
 (setq-default tab-width 4)
-(electric-pair-mode 1)
+(setq-default indent-tabs-mode nil)
 
-(spacious-padding-mode 1)
-(load-theme 'kanagawa-wave t)
-(set-frame-font "Inconsolata Nerd Font 16" nil t)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(company dap-mode dashboard eglot-booster exec-path-from-shell
-             flycheck go-mode kanagawa-themes lsp-ui php-mode
-             python-mode python-tdd-mode spacious-padding
-             treemacs-magit treemacs-projectile yasnippet)))
+   '(all-the-icons ccls corfu dashboard emmet-mode exec-path-from-shell
+                   flycheck go-mode kanagawa-themes lsp-docker
+                   posframe python-mode spacious-padding ultra-scroll
+                   vertico web-mode yasnippet)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

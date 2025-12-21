@@ -4,6 +4,7 @@ return {
     picker = {
       sources = {
         explorer = {
+          trash = false,
           layout = {
             layout = {
               width = 32,
