@@ -1,0 +1,12 @@
+[window]
+
+padding = {x = 20, y = 20}
+opacity = 0.9
+blur = true
+
+[font]
+normal = { family = "Inconsolata Nerd Font", style = "Regular" }
+size = 16
+
+[colors.primary]
+background = "#1f1f28"
