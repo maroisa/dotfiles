@@ -21,37 +21,48 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
+
 (setq doom-font (font-spec :family "Inconsolata Nerd Font" :size 22))
-;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-;;
-;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
-;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
-;; refresh your font settings. If Emacs still can't find your font, it likely
-;; wasn't installed correctly. Font issues are rarely Doom issues!
 
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-dracula)
+(setq doom-theme 'doom-one)
 
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
 (map! "C-`" #'+vterm/toggle)
 (map! "C-b" #'+treemacs/toggle)
-
-(setq treemacs-width 30)
 
 (after! go-mode
   (setq gofmt-command "goimports")
   (add-hook 'go-mode-hook
             (lambda ()
               (add-hook 'after-save-hook 'gofmt nil 'make-it-local))))
+
+
+(setq tab-width 4)
+
+;;(use-package! spacious-padding
+;;  :hook (after-init . spacious-padding-mode))
+
+;;(setq spacious-padding-widths
+;;      '(:internal-border-width 20 :header-line-width 4 :mode-line-width 6 :tab-width 4 :right-divider-width 30 :scroll-bar-width 8 :fringe-width 8))
+
+(after! emmet-mode
+  (add-hook 'emmet-mode-hook #'emmet-preview-mode))
+
+(after! eglot
+  (add-hook
+   'eglot-managed-mode-hook
+   (lambda ()
+     (eglot-inlay-hints-mode -1))))
+
+(setq org-roam-directory (file-truename "~/org-roam/"))
+(setq find-file-visit-truename t)
+(org-roam-db-autosync-mode)
+
+
+
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
