@@ -9,11 +9,7 @@
 ;;
 ;; Use 'C-h f package\!' to look up documentation for the `package!' macro.
 
-(package! kanagawa-themes)
-(package! spacious-padding)
-(package! org-modern)
-(package! org-roam)
-
+(package! vue-mode)
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;; (package! some-package)

@@ -20,50 +20,41 @@
 ;;
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
-;;
 
-(setq doom-font (font-spec :family "Inconsolata Nerd Font" :size 22))
+(setq doom-font (font-spec :family "SauceCodePro Nerd Font" :size 20 :weight 'medium)
+      doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 20))
 
-(setq doom-theme 'doom-one)
+;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
+;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
+;; refresh your font settings. If Emacs still can't find your font, it likely
+;; wasn't installed correctly. Font issues are rarely Doom issues!
 
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. This is the default:
+(setq doom-theme 'doom-tokyo-night)
+
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
-(map! "C-`" #'+vterm/toggle)
+(after! treemacs
+  (setq treemacs-width 30)
+  (set-face-attribute 'treemacs-root-face nil :inherit 'variable-pitch)
+  (set-face-attribute 'treemacs-directory-face nil :inherit 'variable-pitch)
+  (set-face-attribute 'treemacs-file-face nil :inherit 'variable-pitch))
+
+(add-hook! 'vue-mode-hook #'lsp!)
+
 (map! "C-b" #'+treemacs/toggle)
-
-(after! go-mode
-  (setq gofmt-command "goimports")
-  (add-hook 'go-mode-hook
-            (lambda ()
-              (add-hook 'after-save-hook 'gofmt nil 'make-it-local))))
-
-
-(setq tab-width 4)
-
-;;(use-package! spacious-padding
-;;  :hook (after-init . spacious-padding-mode))
-
-;;(setq spacious-padding-widths
-;;      '(:internal-border-width 20 :header-line-width 4 :mode-line-width 6 :tab-width 4 :right-divider-width 30 :scroll-bar-width 8 :fringe-width 8))
-
-(after! emmet-mode
-  (add-hook 'emmet-mode-hook #'emmet-preview-mode))
-
-(after! eglot
-  (add-hook
-   'eglot-managed-mode-hook
-   (lambda ()
-     (eglot-inlay-hints-mode -1))))
-
-(setq org-roam-directory (file-truename "~/org-roam/"))
-(setq find-file-visit-truename t)
-(org-roam-db-autosync-mode)
-
-
-
-
+(map! "C-z" #'+zen/toggle)
+(map! "C-f" #'toggle-frame-fullscreen)
+(map! "C-`" #'+vterm/toggle)
+(map! "C-c C-t" #'centaur-tabs-mode)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
