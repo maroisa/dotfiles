@@ -50,6 +50,13 @@
 
 (add-hook! 'vue-mode-hook #'lsp!)
 
+(after! go-mode
+  (setq gofmt-command "goimports")
+  (add-hook 'go-mode-hook
+            (lambda ()
+              (add-hook 'after-save-hook 'gofmt nil 'make-it-local))))
+
+
 (map! "C-b" #'+treemacs/toggle)
 (map! "C-z" #'+zen/toggle)
 (map! "C-f" #'toggle-frame-fullscreen)
