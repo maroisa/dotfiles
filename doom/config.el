@@ -20,10 +20,10 @@
 ;;
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
-
+;;
 (setq doom-font (font-spec :family "SauceCodePro Nerd Font" :size 20 :weight 'medium)
       doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 20))
-
+;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
@@ -43,12 +43,7 @@
 (setq org-directory "~/org/")
 
 (after! treemacs
-  (setq treemacs-width 30)
-  (set-face-attribute 'treemacs-root-face nil :inherit 'variable-pitch)
-  (set-face-attribute 'treemacs-directory-face nil :inherit 'variable-pitch)
-  (set-face-attribute 'treemacs-file-face nil :inherit 'variable-pitch))
-
-(add-hook! 'vue-mode-hook #'lsp!)
+  (setq treemacs-width 30))
 
 (after! go-mode
   (setq gofmt-command "goimports")
@@ -56,6 +51,7 @@
             (lambda ()
               (add-hook 'after-save-hook 'gofmt nil 'make-it-local))))
 
+(setq! company-idle-delay 0)
 
 (map! "C-b" #'+treemacs/toggle)
 (map! "C-z" #'+zen/toggle)
