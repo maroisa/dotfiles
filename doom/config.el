@@ -51,7 +51,12 @@
             (lambda ()
               (add-hook 'after-save-hook 'gofmt nil 'make-it-local))))
 
+(after! web-mode
+  (setq web-mode-style-padding 4)
+  (setq web-mode-script-padding 4))
+
 (setq! company-idle-delay 0)
+
 
 (map! "C-b" #'+treemacs/toggle)
 (map! "C-z" #'+zen/toggle)
