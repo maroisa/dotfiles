@@ -5,6 +5,7 @@ contains:
 - zsh (.zshrc, prezto, powerlevel10k)
 - Kvantum (customized WhiteSur Dark and Sweet-Ambar-Blue)
 - kitty
+- emacs
 - fastfetch
 
 ## Setup
