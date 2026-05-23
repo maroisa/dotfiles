@@ -7,6 +7,7 @@ contains:
 - kitty
 - emacs
 - fastfetch
+- neovim
 
 ## Setup
 
