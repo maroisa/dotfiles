@@ -1,0 +1,26 @@
+. "$HOME/.cargo/env"
+eval "$(direnv hook zsh)"
+
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Source Prezto.
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+fi
+
+# Customize to your needs...
+
+# Environment Variables
+export GOPATH=$HOME/go
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH="\
+$HOME/.local/bin:\
+$HOME/.npm-global/bin:\
+$GOPATH/bin:\
+$HOME/.config/emacs/bin:\
+$PATH"
+
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
