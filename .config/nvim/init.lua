@@ -85,7 +85,7 @@ P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
 -- ============================================================
--- SECTION 1: FOUNDATION
+-- SECTION 1: OPTIONS
 -- Core Neovim settings, leaders, options, basic keymaps, basic autocmds
 -- ============================================================
 do
@@ -171,7 +171,13 @@ do
   -- instead raise a dialog asking if you wish to save the current file(s)
   -- See `:help 'confirm'`
   vim.o.confirm = true
+end
 
+-- ============================================================
+-- SECTION 2: KEYMAPS
+-- basic keymaps
+-- ============================================================
+do
   -- [[ Basic Keymaps ]]
   --  See `:help vim.keymap.set()`
 
@@ -188,7 +194,7 @@ do
     underline = { severity = { min = vim.diagnostic.severity.WARN } },
 
     -- Can switch between these as you prefer
-    virtual_text = true,   -- Text shows up at the end of the line
+    virtual_text = true, -- Text shows up at the end of the line
     virtual_lines = false, -- Text shows up underneath the line, with virtual lines
 
     -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
@@ -228,18 +234,8 @@ do
   vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
   vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-  -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
-  -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
-  -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
-  -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
-  -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
-  -- [[ Basic Autocommands ]]
-  --  See `:help lua-guide-autocommands`
 
-  -- Highlight when yanking (copying) text
-  --  Try it with `yap` in normal mode
-  --  See `:help vim.hl.on_yank()`
   vim.api.nvim_create_autocmd('TextYankPost', {
     desc = 'Highlight when yanking (copying) text',
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -248,7 +244,7 @@ do
 end
 
 -- ============================================================
--- SECTION 2: PLUGIN MANAGER INTRO
+-- SECTION 3: PLUGIN MANAGER INTRO
 -- vim.pack intro, build hooks
 -- ============================================================
 do
@@ -300,8 +296,7 @@ do
       end
 
       if name == 'LuaSnip' then
-        if vim.fn.has 'win32' ~= 1 and vim.fn.executable 'make' == 1 then run_build(name, { 'make', 'install_jsregexp' },
-            ev.data.path) end
+        if vim.fn.has 'win32' ~= 1 and vim.fn.executable 'make' == 1 then run_build(name, { 'make', 'install_jsregexp' }, ev.data.path) end
         return
       end
 
@@ -321,7 +316,7 @@ end
 local function gh(repo) return 'https://github.com/' .. repo end
 
 -- ============================================================
--- SECTION 3: UI / CORE UX PLUGINS
+-- SECTION 4: UI / CORE UX PLUGINS
 -- guess-indent, gitsigns, which-key, colorscheme, todo-comments, mini modules
 -- ============================================================
 do
@@ -340,13 +335,6 @@ do
   -- and then call its `setup()` function to start it with default settings.
   vim.pack.add { gh 'NMAC427/guess-indent.nvim' }
   require('guess-indent').setup {}
-
-  -- Because lua is a real programming language, you can also have some logic to your installation -
-  -- like only installing a plugin if a condition is met.
-  --
-  -- Here we only install `nvim-web-devicons` (which adds pretty icons) if we have a Nerd Font,
-  -- since otherwise the icons won't display properly.
-  if vim.g.have_nerd_font then vim.pack.add { gh 'nvim-tree/nvim-web-devicons' } end
 
   -- Here is a more advanced configuration example that passes options to `gitsigns.nvim`
   --
@@ -371,10 +359,10 @@ do
     icons = { mappings = vim.g.have_nerd_font },
     -- Document existing key chains
     spec = {
-      { '<leader>s', group = '[S]earch',    mode = { 'n', 'v' } },
+      { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
-      { '<leader>h', group = 'Git [H]unk',  mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
-      { 'gr',        group = 'LSP Actions', mode = { 'n' } },
+      { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
+      { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
   }
 
@@ -385,6 +373,9 @@ do
   --
   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
   vim.pack.add { gh 'rebelot/kanagawa.nvim' }
+  require('kanagawa').setup({
+    transparent = true,
+  })
   vim.cmd.colorscheme 'kanagawa-dragon'
 
   -- Highlight todo, notes, etc in comments
@@ -394,6 +385,13 @@ do
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
   vim.pack.add { gh 'nvim-mini/mini.nvim' }
+
+  -- If a nerd font is available, load the icons module for pretty icons in various plugins.
+  if vim.g.have_nerd_font then
+    require('mini.icons').setup()
+    -- Used for backwards compatibility with plugins that require `nvim-web-devicons` (e.g. telescope.nvim)
+    MiniIcons.mock_nvim_web_devicons()
+  end
 
   -- Better Around/Inside textobjects
   --
@@ -435,7 +433,7 @@ do
 end
 
 -- ============================================================
--- SECTION 4: SEARCH & NAVIGATION
+-- SECTION 5: SEARCH & NAVIGATION
 -- Telescope setup, keymaps, LSP picker mappings
 -- ============================================================
 do
@@ -566,12 +564,11 @@ do
   )
 
   -- Shortcut for searching your Neovim configuration files
-  vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end,
-    { desc = '[S]earch [N]eovim files' })
+  vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
 end
 
 -- ============================================================
--- SECTION 5: LSP
+-- SECTION 6: LSP
 -- LSP keymaps, server configuration, Mason tools installations
 -- ============================================================
 do
@@ -668,9 +665,7 @@ do
       --
       -- This may be unwanted, since they displace some of your code
       if client and client:supports_method('textDocument/inlayHint', event.buf) then
-        map('<leader>th',
-          function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end,
-          '[T]oggle Inlay [H]ints')
+        map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
       end
     end,
   })
@@ -759,7 +754,7 @@ do
 end
 
 -- ============================================================
--- SECTION 6: FORMATTING
+-- SECTION 7: FORMATTING
 -- conform.nvim setup and keymap
 -- ============================================================
 do
@@ -793,12 +788,11 @@ do
     },
   }
 
-  vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end,
-    { desc = '[F]ormat buffer' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
 end
 
 -- ============================================================
--- SECTION 7: AUTOCOMPLETE & SNIPPETS
+-- SECTION 8: AUTOCOMPLETE & SNIPPETS
 -- blink.cmp and luasnip setup
 -- ============================================================
 do
@@ -841,7 +835,7 @@ do
       -- <c-k>: Toggle signature help
       --
       -- See `:help blink-cmp-config-keymap` for defining your own keymap
-      preset = 'super-tab',
+      preset = 'enter',
 
       -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -880,7 +874,7 @@ do
 end
 
 -- ============================================================
--- SECTION 8: TREESITTER
+-- SECTION 9: TREESITTER
 -- Parser installation, syntax highlighting, folds, indentation
 -- ============================================================
 do
@@ -942,7 +936,7 @@ do
 end
 
 -- ============================================================
--- SECTION 9: OPTIONAL EXAMPLES / NEXT STEPS
+-- SECTION 10: OPTIONAL EXAMPLES / NEXT STEPS
 -- kickstart.plugins.* examples
 -- ============================================================
 do
@@ -960,11 +954,7 @@ do
   require 'kickstart.plugins.lint'
   require 'kickstart.plugins.autopairs'
   require 'kickstart.plugins.neo-tree'
-  require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
-
-  -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
+  require 'kickstart.plugins.gitsigns'
   require 'custom.plugins'
 end
 
