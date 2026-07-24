@@ -2,10 +2,12 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-. "$HOME/.cargo/env" 
-
+#
+# Executes commands at the start of an interactive session.
+#
 # Authors:
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
+#
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
@@ -15,14 +17,19 @@ fi
 # Customize to your needs...
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-alias xi="sudo xbps-install"
-alias xs="sudo xbps-query -Rs"
-alias xrm="sudo xbps-remove -R"
-
-export EDITOR="nvim"
+. $HOME/.cargo/env
+. $HOME/.deno/env
 
 export PATH="\
 $HOME/.local/bin:\
-$HOME/.npm-global/bin:\
 $HOME/go/bin:\
-$PATH"
+$HOME/.local/share/pnpm/bin:\
+$HOME/.config/composer/vendor/bin:\
+/opt/flutter/bin:\
+$PATH
+"
+
+alias xi="sudo xbps-install"
+alias xrm="sudo xbps-remove -R"
+alias xs="sudo xbps-query -Rs"
+eval "$(direnv hook zsh)"
